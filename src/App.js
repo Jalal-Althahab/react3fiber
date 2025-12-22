@@ -1,79 +1,110 @@
 import { useState } from "react"
 import { Canvas } from "@react-three/fiber"
-import { Environment, Bvh, OrbitControls, ContactShadows } from "@react-three/drei"
+import { Environment, Bvh, OrbitControls, ContactShadows, BakeShadows } from "@react-three/drei"
 import { EffectComposer, N8AO, TiltShift2, ToneMapping, Bloom, Vignette } from "@react-three/postprocessing"
 import { Scene } from "./Scene"
 
 export const App = () => {
-  // State for Majlis Configuration
+  // Enhanced Configuration State
   const [config, setConfig] = useState({
-    width: 2.5,
-    depth: 2.5,
-    mainColor: "#008080", // Teal/Turquoise default
-    patternColor: "#111111", // Black patterns
-    accentColor: "#d4af37" // Gold
+    width: 3.5,
+    depth: 3.0,
+    
+    // Pattern Selection Per Part
+    mattressPattern: "Sadu", 
+    backrestPattern: "Royal", 
+    armrestPattern: "Najdi",
+    
+    // Colors
+    mattressColor: "#006064", // Deep Teal
+    backrestColor: "#004d40", // Darker Teal
+    armrestColor: "#00838f",  // Light Teal
+    patternColor: "#e0f7fa",  // Off-white pattern
+    floorColor: "#eaddcf"
   });
 
   const handleChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
 
+  const patternOptions = [
+    { value: "Sadu", label: "Sadu (Diamonds)" },
+    { value: "Najdi", label: "Najdi (Triangles)" },
+    { value: "Royal", label: "Royal (Islamic Star)" },
+    { value: "Damascus", label: "Damascus (Floral)" },
+    { value: "Kufic", label: "Kufic (Geometric)" },
+    { value: "Modern", label: "Modern (Lines)" },
+  ];
+
   return (
     <>
       {/* HTML Overlay Controls */}
       <div className="controls">
-        <h3>Majlis Configurator</h3>
+        <h3>Majlis Designer</h3>
         
+        <div className="section-title">Dimensions</div>
         <div className="control-group">
-          <label>Room Width: <span className="value-display">{config.width}m</span></label>
-          <input 
-            type="range" min="2" max="5" step="0.1" 
-            value={config.width} 
-            onChange={(e) => handleChange('width', parseFloat(e.target.value))} 
-          />
+          <label>Room Width <span className="value-display">{config.width}m</span></label>
+          <input type="range" min="2.5" max="6" step="0.1" value={config.width} onChange={(e) => handleChange('width', parseFloat(e.target.value))} />
+        </div>
+        <div className="control-group">
+          <label>Room Depth <span className="value-display">{config.depth}m</span></label>
+          <input type="range" min="2.5" max="6" step="0.1" value={config.depth} onChange={(e) => handleChange('depth', parseFloat(e.target.value))} />
         </div>
 
+        <div className="section-title">Engraving Styles (Tattoos)</div>
         <div className="control-group">
-          <label>Room Depth: <span className="value-display">{config.depth}m</span></label>
-          <input 
-            type="range" min="2" max="5" step="0.1" 
-            value={config.depth} 
-            onChange={(e) => handleChange('depth', parseFloat(e.target.value))} 
-          />
+          <label>Mattress Pattern</label>
+          <select value={config.mattressPattern} onChange={(e) => handleChange('mattressPattern', e.target.value)}>
+            {patternOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+          </select>
+        </div>
+        <div className="control-group">
+          <label>Backrest Pattern</label>
+          <select value={config.backrestPattern} onChange={(e) => handleChange('backrestPattern', e.target.value)}>
+            {patternOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+          </select>
+        </div>
+        <div className="control-group">
+          <label>Armrest Pattern</label>
+          <select value={config.armrestPattern} onChange={(e) => handleChange('armrestPattern', e.target.value)}>
+            {patternOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+          </select>
         </div>
 
+        <div className="section-title">Colors</div>
         <div className="control-group">
-          <label>Fabric Color</label>
-          <input 
-            type="color" 
-            value={config.mainColor} 
-            onChange={(e) => handleChange('mainColor', e.target.value)} 
-          />
+          <label>Fabric Color (Base)</label>
+          <input type="color" value={config.mattressColor} onChange={(e) => handleChange('mattressColor', e.target.value)} />
         </div>
-
         <div className="control-group">
-          <label>Pattern Color</label>
-          <input 
-            type="color" 
-            value={config.patternColor} 
-            onChange={(e) => handleChange('patternColor', e.target.value)} 
-          />
+          <label>Pattern Embroidery Color</label>
+          <input type="color" value={config.patternColor} onChange={(e) => handleChange('patternColor', e.target.value)} />
+        </div>
+        <div className="control-group">
+          <label>Floor Marble</label>
+          <input type="color" value={config.floorColor} onChange={(e) => handleChange('floorColor', e.target.value)} />
         </div>
       </div>
 
       {/* 3D Scene */}
-      <Canvas shadows dpr={[1, 2]} gl={{ antialias: false }} camera={{ position: [6, 4, 6], fov: 45, near: 0.1, far: 30 }}>
+      <Canvas shadows dpr={[1, 1.5]} gl={{ antialias: false }} camera={{ position: [6, 4, 6], fov: 40, near: 0.1, far: 30 }}>
         <color attach="background" args={['#fdfcf5']} />
-        
-        <ambientLight intensity={0.8} />
-        <spotLight position={[5, 8, 5]} angle={0.5} penumbra={1} intensity={1} castShadow />
-        <spotLight position={[-5, 5, -5]} angle={0.5} penumbra={1} intensity={0.5} color="#ffdcb4" />
+        <ambientLight intensity={0.7} />
+        <directionalLight 
+          position={[5, 8, 5]} 
+          intensity={1.2} 
+          castShadow 
+          shadow-mapSize={[1024, 1024]}
+          shadow-bias={-0.0001}
+        />
         <Environment preset="city" />
+        <BakeShadows />
 
         <Bvh firstHitOnly>
           <group position={[0, -0.5, 0]}>
             <Scene config={config} />
-            <ContactShadows resolution={1024} scale={30} blur={2} opacity={0.5} far={10} color="#1a0a0a" />
+            <ContactShadows resolution={1024} scale={40} blur={2.5} opacity={0.6} far={1} color="#000" />
           </group>
         </Bvh>
 
