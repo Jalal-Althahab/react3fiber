@@ -7,8 +7,8 @@ import { Scene } from "./Scene"
 export const App = () => {
   // Enhanced Configuration State
   const [config, setConfig] = useState({
-    width: 3.5,
-    depth: 3.0,
+    width: 4.0,
+    depth: 3.5,
     
     // Pattern Selection Per Part
     mattressPattern: "Sadu", 
@@ -16,11 +16,11 @@ export const App = () => {
     armrestPattern: "Najdi",
     
     // Colors
-    mattressColor: "#006064", // Deep Teal
-    backrestColor: "#004d40", // Darker Teal
-    armrestColor: "#00838f",  // Light Teal
-    patternColor: "#e0f7fa",  // Off-white pattern
-    floorColor: "#eaddcf"
+    mattressColor: "#006064", 
+    backrestColor: "#004d40", 
+    armrestColor: "#00838f",  
+    patternColor: "#e0f7fa",  
+    floorColor: "#f0f0f0" // Lighter for better reflection
   });
 
   const handleChange = (key, value) => {
@@ -45,14 +45,14 @@ export const App = () => {
         <div className="section-title">Dimensions</div>
         <div className="control-group">
           <label>Room Width <span className="value-display">{config.width}m</span></label>
-          <input type="range" min="2.5" max="6" step="0.1" value={config.width} onChange={(e) => handleChange('width', parseFloat(e.target.value))} />
+          <input type="range" min="3" max="6" step="0.1" value={config.width} onChange={(e) => handleChange('width', parseFloat(e.target.value))} />
         </div>
         <div className="control-group">
           <label>Room Depth <span className="value-display">{config.depth}m</span></label>
-          <input type="range" min="2.5" max="6" step="0.1" value={config.depth} onChange={(e) => handleChange('depth', parseFloat(e.target.value))} />
+          <input type="range" min="3" max="6" step="0.1" value={config.depth} onChange={(e) => handleChange('depth', parseFloat(e.target.value))} />
         </div>
 
-        <div className="section-title">Engraving Styles (Tattoos)</div>
+        <div className="section-title">Engraving Styles</div>
         <div className="control-group">
           <label>Mattress Pattern</label>
           <select value={config.mattressPattern} onChange={(e) => handleChange('mattressPattern', e.target.value)}>
@@ -82,14 +82,15 @@ export const App = () => {
           <input type="color" value={config.patternColor} onChange={(e) => handleChange('patternColor', e.target.value)} />
         </div>
         <div className="control-group">
-          <label>Floor Marble</label>
+          <label>Floor Marble Tint</label>
           <input type="color" value={config.floorColor} onChange={(e) => handleChange('floorColor', e.target.value)} />
         </div>
       </div>
 
       {/* 3D Scene */}
-      <Canvas shadows dpr={[1, 1.5]} gl={{ antialias: false }} camera={{ position: [6, 4, 6], fov: 40, near: 0.1, far: 30 }}>
+      <Canvas shadows dpr={[1, 1.5]} gl={{ antialias: false }} camera={{ position: [6, 5, 8], fov: 35, near: 0.1, far: 40 }}>
         <color attach="background" args={['#fdfcf5']} />
+        
         <ambientLight intensity={0.7} />
         <directionalLight 
           position={[5, 8, 5]} 
@@ -104,14 +105,15 @@ export const App = () => {
         <Bvh firstHitOnly>
           <group position={[0, -0.5, 0]}>
             <Scene config={config} />
-            <ContactShadows resolution={1024} scale={40} blur={2.5} opacity={0.6} far={1} color="#000" />
+            {/* Added shadow specifically for small objects, floor handles reflections */}
+            <ContactShadows resolution={1024} scale={50} blur={2} opacity={0.4} far={1.5} color="#000" />
           </group>
         </Bvh>
 
         <OrbitControls 
           minPolarAngle={0} 
           maxPolarAngle={Math.PI / 2.1} 
-          maxDistance={15}
+          maxDistance={20}
           minDistance={2}
           target={[0, 0.5, 0]}
           enableDamping={true}
@@ -126,11 +128,11 @@ export const App = () => {
 function Effects() {
   return (
     <EffectComposer disableNormalPass autoClear={false} multisampling={4}>
-      <N8AO halfRes aoSamples={5} aoRadius={0.3} distanceFalloff={0.5} intensity={1.5} />
-      <Bloom luminanceThreshold={1.2} mipmapBlur intensity={0.3} radius={0.5} />
-      <TiltShift2 samples={5} blur={0.05} />
+      <N8AO halfRes aoSamples={5} aoRadius={0.4} distanceFalloff={0.5} intensity={1.5} />
+      <Bloom luminanceThreshold={1.1} mipmapBlur intensity={0.4} radius={0.5} />
+      <TiltShift2 samples={5} blur={0.03} />
       <ToneMapping />
-      <Vignette eskil={false} offset={0.1} darkness={0.5} />
+      <Vignette eskil={false} offset={0.1} darkness={0.4} />
     </EffectComposer>
   )
 }
