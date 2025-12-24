@@ -6,21 +6,26 @@ import { Scene } from "./Scene"
 
 export const App = () => {
   const [config, setConfig] = useState({
+    // Dimensions
     width: 4.5,
     depth: 4.0,
     
-    // Patterns
+    // Patterns (Tattoos)
     mattressPattern: "Royal", 
     backrestPattern: "Sadu", 
     armrestPattern: "Minimal",
     
     // Colors
-    mattressColor: "#1c2e4a", // Royal Blue Velvet
-    backrestColor: "#16253b", 
-    armrestColor: "#111b2b",  
-    embroideryColor: "#d4af37", // Gold Thread
+    mattressColor: "#1c2e4a", // Royal Blue
+    backrestColor: "#16253b", // Dark Blue
+    armrestColor: "#111b2b",  // Darkest Blue
+    embroideryColor: "#d4af37", // Gold
+    woodColor: "#2c1a1a",     // Dark Wood base
     
-    floorColor: "#f5f5f5"
+    // Environment Colors
+    floorColor: "#f5f5f5",
+    wallColor: "#222222",
+    clockColor: "#d4af37"
   });
 
   const handleChange = (key, value) => {
@@ -33,15 +38,15 @@ export const App = () => {
     { value: "Greek", label: "Versace (Greek Key)" },
     { value: "Floral", label: "Damascus (Floral)" },
     { value: "Minimal", label: "Modern (Linear)" },
-    { value: "None", label: "No Pattern (Plain Velvet)" },
+    { value: "None", label: "No Pattern (Solid)" },
   ];
 
   return (
     <>
       <div className="controls">
-        <h3>LUXE MAJLIS</h3>
+        <h3>MAJLIS CONFIGURATOR</h3>
         
-        <div className="section-title">Space</div>
+        <div className="section-title">Room Size</div>
         <div className="control-group">
           <label>Width <span className="value-display">{config.width}m</span></label>
           <input type="range" min="3" max="7" step="0.1" value={config.width} onChange={(e) => handleChange('width', parseFloat(e.target.value))} />
@@ -51,7 +56,7 @@ export const App = () => {
           <input type="range" min="3" max="7" step="0.1" value={config.depth} onChange={(e) => handleChange('depth', parseFloat(e.target.value))} />
         </div>
 
-        <div className="section-title">Embroidery (Tattoo)</div>
+        <div className="section-title">Embroidery Patterns</div>
         <div className="control-group">
           <label>Seat Pattern</label>
           <select value={config.mattressPattern} onChange={(e) => handleChange('mattressPattern', e.target.value)}>
@@ -71,26 +76,56 @@ export const App = () => {
           </select>
         </div>
 
-        <div className="section-title">Materials & Palette</div>
+        <div className="section-title">Fabric Colors</div>
         <div className="control-group">
-          <label>Velvet Base</label>
+          <label>Main Seat (Mattress)</label>
           <div className="color-wrapper">
             <input type="color" value={config.mattressColor} onChange={(e) => handleChange('mattressColor', e.target.value)} />
             <span className="color-label">{config.mattressColor}</span>
           </div>
         </div>
         <div className="control-group">
-          <label>Velvet Highlight</label>
+          <label>Backrest Cushion</label>
           <div className="color-wrapper">
             <input type="color" value={config.backrestColor} onChange={(e) => handleChange('backrestColor', e.target.value)} />
             <span className="color-label">{config.backrestColor}</span>
           </div>
         </div>
         <div className="control-group">
-          <label>Thread / Gold</label>
+          <label>Armrest (Mada'a)</label>
+          <div className="color-wrapper">
+            <input type="color" value={config.armrestColor} onChange={(e) => handleChange('armrestColor', e.target.value)} />
+            <span className="color-label">{config.armrestColor}</span>
+          </div>
+        </div>
+
+        <div className="section-title">Details & Decor</div>
+        <div className="control-group">
+          <label>Embroidery / Gold</label>
           <div className="color-wrapper">
             <input type="color" value={config.embroideryColor} onChange={(e) => handleChange('embroideryColor', e.target.value)} />
             <span className="color-label">{config.embroideryColor}</span>
+          </div>
+        </div>
+        <div className="control-group">
+          <label>Wood Base</label>
+          <div className="color-wrapper">
+            <input type="color" value={config.woodColor} onChange={(e) => handleChange('woodColor', e.target.value)} />
+            <span className="color-label">{config.woodColor}</span>
+          </div>
+        </div>
+        <div className="control-group">
+          <label>Wall Color</label>
+          <div className="color-wrapper">
+            <input type="color" value={config.wallColor} onChange={(e) => handleChange('wallColor', e.target.value)} />
+            <span className="color-label">{config.wallColor}</span>
+          </div>
+        </div>
+        <div className="control-group">
+          <label>Clock & Table Metal</label>
+          <div className="color-wrapper">
+            <input type="color" value={config.clockColor} onChange={(e) => handleChange('clockColor', e.target.value)} />
+            <span className="color-label">{config.clockColor}</span>
           </div>
         </div>
         <div className="control-group">
@@ -105,12 +140,11 @@ export const App = () => {
       <Canvas shadows dpr={[1, 1.5]} gl={{ antialias: true, toneMappingExposure: 1.1 }} camera={{ position: [6, 4, 7], fov: 35 }}>
         <color attach="background" args={['#111']} />
         
-        {/* Studio Lighting for Velvet Sheen */}
+        {/* Studio Lighting */}
         <ambientLight intensity={0.4} />
         <spotLight position={[5, 8, 5]} angle={0.4} penumbra={0.5} intensity={1.5} castShadow shadow-bias={-0.0001} />
         <spotLight position={[-5, 8, -5]} angle={0.4} penumbra={0.5} intensity={0.5} color="#ffdcb4" />
-        {/* Rim light for edges */}
-        <pointLight position={[0, 2, -5]} intensity={0.5} color="#fff" />
+        <pointLight position={[0, 3, 0]} intensity={0.3} color="white" />
         
         <Environment preset="lobby" />
         <SoftShadows size={10} samples={16} />
