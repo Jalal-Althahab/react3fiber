@@ -1,13 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import * as THREE from 'three';
-import { RoundedBox, Cylinder, Box, Float, Text, MeshReflectorMaterial, useTexture } from "@react-three/drei";
+import { RoundedBox, Cylinder, Box, Float, Text, MeshReflectorMaterial, Torus } from "@react-three/drei";
 import { Select } from "@react-three/postprocessing";
 
 export function Scene({ config }) {
   const { 
     width, depth, 
     mattressPattern, backrestPattern, armrestPattern,
-    mattressColor, backrestColor, armrestColor, embroideryColor, floorColor 
+    mattressColor, backrestColor, armrestColor, embroideryColor, woodColor,
+    floorColor, wallColor, clockColor 
   } = config;
   
   const [hovered, setHover] = useState(null);
@@ -17,7 +18,7 @@ export function Scene({ config }) {
 
   const commonProps = {
     hovered, setHover,
-    colors: { mattress: mattressColor, backrest: backrestColor, armrest: armrestColor, embroidery: embroideryColor },
+    colors: { mattress: mattressColor, backrest: backrestColor, armrest: armrestColor, embroidery: embroideryColor, wood: woodColor },
     patterns: { mattress: mattressPattern, backrest: backrestPattern, armrest: armrestPattern }
   };
 
@@ -41,18 +42,23 @@ export function Scene({ config }) {
         />
       </mesh>
 
-      {/* --- Wall Decor (Marble Panels) --- */}
+      {/* --- Wall Decor (Marble Panels & Clock) --- */}
       <group position={[0, 2, -backOffset - 0.5]}>
+         {/* Main Wall Panel */}
          <Box args={[width + 2, 4, 0.2]}>
-            <meshPhysicalMaterial color="#222" roughness={0.5} metalness={0.5} />
+            <meshPhysicalMaterial color={wallColor} roughness={0.5} metalness={0.2} />
          </Box>
-         {/* Gold strips on wall */}
-         <Box args={[width + 2, 0.05, 0.22]} position={[0, 1, 0]}>
+         
+         {/* Decorative Strips (Gold) */}
+         <Box args={[width + 2, 0.05, 0.22]} position={[0, 1.2, 0]}>
             <meshStandardMaterial color={embroideryColor} metalness={1} roughness={0.1} />
          </Box>
-         <Box args={[width + 2, 0.05, 0.22]} position={[0, -1, 0]}>
+         <Box args={[width + 2, 0.05, 0.22]} position={[0, -1.2, 0]}>
             <meshStandardMaterial color={embroideryColor} metalness={1} roughness={0.1} />
          </Box>
+
+         {/* THE CLOCK */}
+         <WallClock position={[0, 0.5, 0.15]} color={clockColor} />
       </group>
 
       {/* --- U-Shape Majlis --- */}
@@ -65,7 +71,7 @@ export function Scene({ config }) {
       <MadaaCorner position={[sideOffset, 0, -backOffset]} color={armrestColor} patternColor={embroideryColor} />
 
       {/* --- Center Pieces --- */}
-      <ModernTable position={[0, 0, 0]} color={backrestColor} accent={embroideryColor} />
+      <ModernTable position={[0, 0, 0]} color={backrestColor} accent={clockColor} />
       
       {/* Rug */}
       <mesh rotation={[-Math.PI/2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
@@ -73,14 +79,20 @@ export function Scene({ config }) {
         <meshPhysicalMaterial color={mattressColor} roughness={1} sheen={0.5} />
       </mesh>
 
-      {/* --- Floating Modern TV Unit --- */}
-      <TVWallUnit 
-        position={[0, 1.5, backOffset + 2]} 
-        rotation={[0, Math.PI, 0]} 
-        woodColor={armrestColor}
-        accentColor={embroideryColor}
-      />
-
+      {/* Floating Text */}
+      <Float speed={2} rotationIntensity={0} floatIntensity={0.2} floatingRange={[0, 0.1]}>
+        <Text 
+          position={[0, 3.5, -backOffset]} 
+          color={clockColor} 
+          fontSize={0.2} 
+          font="Inter-Regular.woff"
+          anchorX="center"
+          anchorY="middle"
+          letterSpacing={0.1}
+        >
+          AL-MAJLIS
+        </Text>
+      </Float>
     </group>
   );
 }
@@ -96,9 +108,9 @@ function MajlisSection({ position, rotation, length, colors, patterns, hovered, 
       <Select enabled={hovered === name}>
         <group onPointerOver={(e) => (e.stopPropagation(), setHover(name))} onPointerOut={() => setHover(null)}>
           
-          {/* 1. Base Platform (Marble/Wood) */}
+          {/* 1. Base Platform (Controlled by WoodColor) */}
           <Box args={[length, 0.2, 0.85]} position={[0, 0.1, 0]} castShadow>
-             <meshStandardMaterial color="#1a1a1a" roughness={0.1} />
+             <meshStandardMaterial color={colors.wood} roughness={0.5} />
           </Box>
           <Box args={[length, 0.02, 0.86]} position={[0, 0.2, 0]}>
              <meshStandardMaterial color={colors.embroidery} metalness={1} roughness={0.1} />
@@ -174,8 +186,6 @@ function MajlisSection({ position, rotation, length, colors, patterns, hovered, 
   );
 }
 
-// --- Specialized Components ---
-
 // Reusable Velvet-like material
 function FabricMaterial({ color }) {
   return (
@@ -189,6 +199,44 @@ function FabricMaterial({ color }) {
       clearcoat={0}
     />
   );
+}
+
+function WallClock({ position, color }) {
+  return (
+    <group position={position}>
+      {/* Outer Ring */}
+      <Torus args={[0.6, 0.04, 16, 64]}>
+        <meshStandardMaterial color={color} metalness={1} roughness={0.1} />
+      </Torus>
+      {/* Inner Ring */}
+      <Torus args={[0.55, 0.01, 16, 64]}>
+        <meshStandardMaterial color={color} metalness={1} roughness={0.1} />
+      </Torus>
+      {/* Clock Face */}
+      <Cylinder args={[0.58, 0.58, 0.05, 32]} rotation={[Math.PI/2, 0, 0]}>
+        <meshPhysicalMaterial color="black" roughness={0.2} clearcoat={1} />
+      </Cylinder>
+      {/* Center Piece */}
+      <mesh position={[0, 0, 0.06]}>
+        <cylinderGeometry args={[0.05, 0.05, 0.02, 16]} rotation={[Math.PI/2, 0, 0]} />
+        <meshStandardMaterial color={color} metalness={1} />
+      </mesh>
+      {/* Hour Hand */}
+      <Box args={[0.02, 0.35, 0.01]} position={[0, 0.1, 0.08]} rotation={[0,0,-0.5]}>
+        <meshStandardMaterial color={color} metalness={1} />
+      </Box>
+      {/* Minute Hand */}
+      <Box args={[0.015, 0.45, 0.01]} position={[0.1, 0, 0.08]} rotation={[0,0,-2]}>
+        <meshStandardMaterial color={color} metalness={1} />
+      </Box>
+      {/* Hour Markers */}
+      {[...Array(12)].map((_, i) => (
+         <Box key={i} args={[0.02, 0.1, 0.01]} position={[Math.sin(i/12 * Math.PI*2)*0.45, Math.cos(i/12 * Math.PI*2)*0.45, 0.06]} rotation={[0,0, -i/12 * Math.PI*2]} >
+            <meshStandardMaterial color={color} metalness={1} />
+         </Box>
+      ))}
+    </group>
+  )
 }
 
 function MadaaCorner({ position, color, patternColor }) {
@@ -228,38 +276,6 @@ function ModernTable({ position, color, accent }) {
       {/* Legs */}
       <group position={[0, 0.175, 0]}>
          <Box args={[1.2, 0.35, 0.8]}><meshStandardMaterial color={color} /></Box>
-      </group>
-    </group>
-  )
-}
-
-function TVWallUnit({ position, rotation, woodColor, accentColor }) {
-  return (
-    <group position={position} rotation={rotation}>
-      {/* Floating Console */}
-      <RoundedBox args={[2.8, 0.4, 0.5]} radius={0.02} position={[0, -0.5, 0]} castShadow>
-         <meshStandardMaterial color={woodColor} roughness={0.2} />
-      </RoundedBox>
-      {/* Gold Inlay */}
-      <Box args={[2.82, 0.05, 0.52]} position={[0, -0.6, 0]}>
-         <meshStandardMaterial color={accentColor} metalness={1} roughness={0.2} />
-      </Box>
-      
-      {/* Wall Panel */}
-      <Box args={[3.0, 2.5, 0.1]} position={[0, 1, -0.3]}>
-         <meshStandardMaterial color="#1a1a1a" roughness={0.5} />
-      </Box>
-
-      {/* TV Screen */}
-      <group position={[0, 1.0, 0]}>
-        <RoundedBox args={[2.2, 1.25, 0.05]} radius={0.01} castShadow>
-          <meshStandardMaterial color="#050505" roughness={0.2} metalness={0.8} />
-        </RoundedBox>
-        {/* Glow of screen */}
-        <mesh position={[0, 0, 0.03]}>
-          <planeGeometry args={[2.15, 1.2]} />
-          <meshBasicMaterial color="#000" />
-        </mesh>
       </group>
     </group>
   )
