@@ -66,6 +66,28 @@ export const App = () => {
   const handleChange = (key, value) => setConfig(prev => ({ ...prev, [key]: value }));
   const handleCostChange = (key, value) => setCosts(prev => ({ ...prev, [key]: parseFloat(value) }));
 
+  // --- EXPORT FUNCTIONALITY ---
+  const handleExportJSON = () => {
+    const dataToExport = {
+      project: "Majlis Configuration",
+      created: new Date().toLocaleString(),
+      design: config,
+      accounting: costs,
+      metrics: stats
+    };
+
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const href = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = `Majlis_Order_${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const patterns = [
     { value: "Sadu", label: "Sadu (Heritage)" },
     { value: "Royal", label: "Royal (Islamic)" },
@@ -78,7 +100,7 @@ export const App = () => {
 
   return (
     <>
-      {/* --- LEFT PANEL: DESIGNER --- */}
+      {/* --- RIGHT PANEL: DESIGNER --- */}
       <div className="controls">
         <h3>DESIGN STUDIO</h3>
         
@@ -139,7 +161,7 @@ export const App = () => {
         </div>
       </div>
 
-      {/* --- RIGHT PANEL: ACCOUNTING & FACTORY --- */}
+      {/* --- LEFT PANEL: ACCOUNTING & FACTORY --- */}
       <div className="dashboard">
         <h3>FACTORY ESTIMATOR</h3>
         
@@ -186,7 +208,10 @@ export const App = () => {
           </div>
         </div>
 
-        <button className="print-btn" onClick={() => window.print()}>Print BOM</button>
+        <div className="button-group">
+          <button className="btn print-btn" onClick={() => window.print()}>Print BOM</button>
+          <button className="btn export-btn" onClick={handleExportJSON}>Export JSON</button>
+        </div>
       </div>
 
       {/* --- 3D SCENE --- */}
@@ -198,9 +223,7 @@ export const App = () => {
         <spotLight position={[-5, 8, -5]} angle={0.4} penumbra={0.5} intensity={0.5} color="#ffdcb4" />
         <pointLight position={[0, 3, 0]} intensity={0.3} color="white" />
         
-        {/* PROCEDURAL ENVIRONMENT (Fixes 'Failed to fetch' error) */}
         <Environment resolution={512}>
-          {/* Ceiling Lights for reflections */}
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -9]} scale={[10, 1, 1]} />
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -6]} scale={[10, 1, 1]} />
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -3]} scale={[10, 1, 1]} />
@@ -208,8 +231,6 @@ export const App = () => {
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 3]} scale={[10, 1, 1]} />
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 6]} scale={[10, 1, 1]} />
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 9]} scale={[10, 1, 1]} />
-          
-          {/* Soft side lighting */}
           <Lightformer intensity={2} rotation-y={Math.PI / 2} position={[-50, 2, 0]} scale={[100, 2, 1]} />
           <Lightformer intensity={2} rotation-y={-Math.PI / 2} position={[50, 2, 0]} scale={[100, 2, 1]} />
         </Environment>
