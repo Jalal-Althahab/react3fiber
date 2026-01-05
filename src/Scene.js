@@ -24,21 +24,21 @@ export function Scene({ config }) {
 
   return (
     <group>
-      {/* --- High Contrast Floor --- */}
+      {/* --- Floor --- */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
         <MeshReflectorMaterial
-          blur={[300, 100]}
+          blur={[400, 100]}
           resolution={1024}
           mixBlur={1}
-          mixStrength={20} // Lower mixStrength ensures the base color is bold
-          roughness={0.4}  // Slight roughness for stone/marble texture
-          depthScale={1.2}
+          mixStrength={50}
+          roughness={0.1}
+          depthScale={1}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.4}
           color={floorColor}
-          metalness={0.6}  // High metalness makes dark colors pop
-          mirror={0.6}     // Good reflection
+          metalness={0.2}
+          mirror={0.7}
         />
       </mesh>
 
@@ -73,7 +73,7 @@ export function Scene({ config }) {
       {/* --- Center Pieces --- */}
       <ModernTable position={[0, 0, 0]} color={backrestColor} accent={clockColor} />
       
-      {/* Rug (Slightly raised to avoid Z-fighting with reflection) */}
+      {/* Rug */}
       <mesh rotation={[-Math.PI/2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
         <planeGeometry args={[width - 1.5, depth - 1.5]} />
         <meshPhysicalMaterial color={mattressColor} roughness={1} sheen={0.5} />
