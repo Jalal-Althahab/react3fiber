@@ -7,21 +7,24 @@ import { Scene } from "./Scene"
 export const App = () => {
   // --- 1. CONFIGURATION STATE (Design) ---
   const [config, setConfig] = useState({
+    // Dimensions
     width: 4.5,
     depth: 4.0,
+    
+    // Patterns
     mattressPattern: "Royal", 
     backrestPattern: "Sadu", 
     armrestPattern: "Najdi",
     
-    // Updated Default Colors for High Contrast
+    // Furniture Colors
     mattressColor: "#1c2e4a",
     backrestColor: "#16253b",
     armrestColor: "#111b2b",
     embroideryColor: "#d4af37",
     woodColor: "#2c1a1a",
     
-    // Dark & Bold Floor Default
-    floorColor: "#101010", 
+    // Room/Environment Colors
+    floorColor: "#101010",
     wallColor: "#222222",
     clockColor: "#d4af37"
   });
@@ -104,7 +107,7 @@ export const App = () => {
 
   return (
     <>
-      {/* --- RIGHT PANEL: DESIGNER --- */}
+      {/* --- LEFT PANEL: DESIGNER --- */}
       <div className="controls">
         <h3>DESIGN STUDIO</h3>
         
@@ -132,7 +135,7 @@ export const App = () => {
           </select>
         </div>
 
-        <div className="section-title">Material Colors</div>
+        <div className="section-title">Furniture Colors</div>
         <div className="control-group">
           <label>Velvet Fabric</label>
           <div className="color-wrapper">
@@ -151,27 +154,29 @@ export const App = () => {
             <input type="color" value={config.woodColor} onChange={(e) => handleChange('woodColor', e.target.value)} />
           </div>
         </div>
+
+        <div className="section-title">Room Atmosphere</div>
         <div className="control-group">
-          <label>Back Wall</label>
+          <label>Wall Paint</label>
           <div className="color-wrapper">
             <input type="color" value={config.wallColor} onChange={(e) => handleChange('wallColor', e.target.value)} />
           </div>
         </div>
         <div className="control-group">
-          <label>Clock/Metal</label>
-          <div className="color-wrapper">
-            <input type="color" value={config.clockColor} onChange={(e) => handleChange('clockColor', e.target.value)} />
-          </div>
-        </div>
-        <div className="control-group">
-          <label>Floor Color</label>
+          <label>Floor Marble</label>
           <div className="color-wrapper">
             <input type="color" value={config.floorColor} onChange={(e) => handleChange('floorColor', e.target.value)} />
           </div>
         </div>
+        <div className="control-group">
+          <label>Decor Accents (Clock)</label>
+          <div className="color-wrapper">
+            <input type="color" value={config.clockColor} onChange={(e) => handleChange('clockColor', e.target.value)} />
+          </div>
+        </div>
       </div>
 
-      {/* --- LEFT PANEL: ACCOUNTING & FACTORY --- */}
+      {/* --- RIGHT PANEL: ACCOUNTING & FACTORY --- */}
       <div className="dashboard">
         <h3>FACTORY ESTIMATOR</h3>
         
@@ -226,15 +231,14 @@ export const App = () => {
 
       {/* --- 3D SCENE --- */}
       <Canvas shadows dpr={[1, 1.5]} gl={{ antialias: true, toneMappingExposure: 1.1 }} camera={{ position: [7, 5, 8], fov: 35 }}>
-        <color attach="background" args={['#050505']} />
+        <color attach="background" args={['#111']} />
         
-        {/* Adjusted Lighting for Dark Floor */}
-        <ambientLight intensity={0.5} />
-        <spotLight position={[5, 8, 5]} angle={0.4} penumbra={0.5} intensity={2.0} castShadow shadow-bias={-0.0001} />
-        <spotLight position={[-5, 8, -5]} angle={0.4} penumbra={0.5} intensity={1.0} color="#ffdcb4" />
-        <pointLight position={[0, 3, 0]} intensity={0.5} color="white" />
+        <ambientLight intensity={0.4} />
+        <spotLight position={[5, 8, 5]} angle={0.4} penumbra={0.5} intensity={1.5} castShadow shadow-bias={-0.0001} />
+        <spotLight position={[-5, 8, -5]} angle={0.4} penumbra={0.5} intensity={0.5} color="#ffdcb4" />
+        <pointLight position={[0, 3, 0]} intensity={0.3} color="white" />
         
-        {/* Procedural Environment */}
+        {/* Procedural Lighting Environment */}
         <Environment resolution={512}>
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -9]} scale={[10, 1, 1]} />
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -6]} scale={[10, 1, 1]} />
