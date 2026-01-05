@@ -12,12 +12,16 @@ export const App = () => {
     mattressPattern: "Royal", 
     backrestPattern: "Sadu", 
     armrestPattern: "Najdi",
+    
+    // Updated Default Colors for High Contrast
     mattressColor: "#1c2e4a",
     backrestColor: "#16253b",
     armrestColor: "#111b2b",
     embroideryColor: "#d4af37",
     woodColor: "#2c1a1a",
-    floorColor: "#f5f5f5",
+    
+    // Dark & Bold Floor Default
+    floorColor: "#101010", 
     wallColor: "#222222",
     clockColor: "#d4af37"
   });
@@ -159,6 +163,12 @@ export const App = () => {
             <input type="color" value={config.clockColor} onChange={(e) => handleChange('clockColor', e.target.value)} />
           </div>
         </div>
+        <div className="control-group">
+          <label>Floor Color</label>
+          <div className="color-wrapper">
+            <input type="color" value={config.floorColor} onChange={(e) => handleChange('floorColor', e.target.value)} />
+          </div>
+        </div>
       </div>
 
       {/* --- LEFT PANEL: ACCOUNTING & FACTORY --- */}
@@ -216,13 +226,15 @@ export const App = () => {
 
       {/* --- 3D SCENE --- */}
       <Canvas shadows dpr={[1, 1.5]} gl={{ antialias: true, toneMappingExposure: 1.1 }} camera={{ position: [7, 5, 8], fov: 35 }}>
-        <color attach="background" args={['#111']} />
+        <color attach="background" args={['#050505']} />
         
-        <ambientLight intensity={0.4} />
-        <spotLight position={[5, 8, 5]} angle={0.4} penumbra={0.5} intensity={1.5} castShadow shadow-bias={-0.0001} />
-        <spotLight position={[-5, 8, -5]} angle={0.4} penumbra={0.5} intensity={0.5} color="#ffdcb4" />
-        <pointLight position={[0, 3, 0]} intensity={0.3} color="white" />
+        {/* Adjusted Lighting for Dark Floor */}
+        <ambientLight intensity={0.5} />
+        <spotLight position={[5, 8, 5]} angle={0.4} penumbra={0.5} intensity={2.0} castShadow shadow-bias={-0.0001} />
+        <spotLight position={[-5, 8, -5]} angle={0.4} penumbra={0.5} intensity={1.0} color="#ffdcb4" />
+        <pointLight position={[0, 3, 0]} intensity={0.5} color="white" />
         
+        {/* Procedural Environment */}
         <Environment resolution={512}>
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -9]} scale={[10, 1, 1]} />
           <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -6]} scale={[10, 1, 1]} />
